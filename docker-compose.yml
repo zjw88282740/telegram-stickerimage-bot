@@ -1,7 +1,8 @@
 services:
   stickerimage-bot:
-    build: .
-    image: telegram-stickerimage-bot:latest
+    # pre-built by .github/workflows/docker-publish.yml on every push to
+    # master, so Portainer only needs to `docker pull`, never `docker build`.
+    image: ghcr.io/zjw88282740/telegram-stickerimage-bot:latest
     container_name: telegram-stickerimage-bot
     restart: unless-stopped
     environment:

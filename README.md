@@ -30,7 +30,9 @@ Leave it as an empty array (`[]`, the default) to allow anyone.
 
 ### Deploying with Docker / Portainer
 
-The repo includes a `Dockerfile` and `docker-compose.yml`. The image bundles Node.js and `ffmpeg` (needed to convert `.webm` video stickers), but **not** `lottie2gif` -- animated `.tgs` sticker conversion will fail gracefully (per-sticker, not a crash) unless you add that binary yourself. The bot uses long-polling, so no port needs to be published.
+The repo includes a `Dockerfile`, `docker-compose.yml`, and a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that builds the image and pushes it to `ghcr.io/zjw88282740/telegram-stickerimage-bot:latest` on every push to `master`. **`docker-compose.yml` references that pre-built image directly (no `build:` step)**, so Portainer only ever runs `docker pull` -- it never needs to build the image itself. This avoids `docker buildx`/BuildKit entirely, which is a common source of stack-deploy failures on some Portainer/Docker setups (e.g. `frame too large` / worker connection errors).
+
+The image bundles Node.js and `ffmpeg` (needed to convert `.webm` video stickers), but **not** `lottie2gif` -- animated `.tgs` sticker conversion will fail gracefully (per-sticker, not a crash) unless you add that binary yourself. The bot uses long-polling, so no port needs to be published.
 
 Configuration is passed in entirely through **environment variables** (no config file needs to be created or bind-mounted on the host):
 
@@ -45,23 +47,18 @@ Configuration is passed in entirely through **environment variables** (no config
 | `DEFAULT_LANG` | no | `en` | see `lang/` for available codes |
 | `LOTTIE2GIF_PATH` | no | `lottie2gif` | only needed if you added that binary to the image |
 
-**1. Deploy the stack in Portainer** -- pick one:
+**1. Make the GHCR package public (one-time).** GitHub Container Registry images are private by default, and Portainer can't pull a private image without extra registry credentials. After the workflow has run at least once (check the *Actions* tab on GitHub), go to your GitHub profile -> *Packages* -> `telegram-stickerimage-bot` -> *Package settings* -> *Change visibility* -> *Public*.
 
-- **Git repository (recommended)**: Portainer -> *Stacks* -> *Add stack* -> *Repository*. Enter this repo's URL (`https://github.com/zjw88282740/telegram-stickerimage-bot`), branch `master`, and `docker-compose.yml` as the compose path. Portainer will build the image on the host from the `Dockerfile` in the repo.
-- **Web editor**: Portainer -> *Stacks* -> *Add stack* -> *Web editor*, paste the contents of `docker-compose.yml` directly. If you'd rather not let Portainer build, replace `build: .` with a pre-built `image:` (see step 2 below).
+**2. Deploy the stack in Portainer** -- pick one:
 
-Either way, in the stack's **Environment variables** section (or directly in the `environment:` block of the compose you pasted), set at least `BOT_TOKEN`, and `ALLOWED_USERS` if you want to restrict access.
+- **Git repository**: Portainer -> *Stacks* -> *Add stack* -> *Repository*. Enter this repo's URL (`https://github.com/zjw88282740/telegram-stickerimage-bot`), branch `master`, and `docker-compose.yml` as the compose path.
+- **Web editor**: Portainer -> *Stacks* -> *Add stack* -> *Web editor*, paste the contents of `docker-compose.yml` directly.
 
-**2. (Optional) Build and push the image yourself** instead of letting Portainer build it, then just reference `image: your-registry/telegram-stickerimage-bot:latest` in the stack:
+In the stack's **Environment variables** section (or directly in the `environment:` block if using the web editor), set at least `BOT_TOKEN`, and `ALLOWED_USERS` if you want to restrict access.
 
-```bash
-docker build -t your-registry/telegram-stickerimage-bot:latest .
-docker push your-registry/telegram-stickerimage-bot:latest
-```
+**3. Deploy the stack.** Portainer pulls the image, creates the `stickerimage-storage` volume for persistent working files, and starts the bot. Check *Containers -> logs* to confirm it connected (`[INTERNAL] [INFO] ...`).
 
-**3. Deploy the stack.** Portainer will build/pull the image, create the `stickerimage-storage` volume for persistent working files, and start the bot. Check *Containers -> logs* to confirm it connected (`[INTERNAL] [INFO] ...`).
-
-To update after a config or code change, just redeploy the stack from Portainer (*Stacks -> your stack -> Pull and redeploy* if using an `image:`, or re-deploy to rebuild if using `build:`).
+To update after a code change: push to `master`, wait for the GitHub Action to finish publishing the new image, then in Portainer go to the stack and use *Pull and redeploy* (or *Update the stack* with "Re-pull image" checked).
 
 If you'd rather manage a full `config.js` file yourself (e.g. to customize `sticker_sources` or `available_lang`), you can still bind-mount one over the baked-in config instead of using environment variables -- add `- /path/on/host/config.js:/app/config.js:ro` under `volumes:` in `docker-compose.yml`.
 
