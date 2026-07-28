@@ -1,0 +1,14 @@
+services:
+  stickerimage-bot:
+    build: .
+    image: telegram-stickerimage-bot:latest
+    container_name: telegram-stickerimage-bot
+    restart: unless-stopped
+    volumes:
+      # config.js is not part of the image (it holds your bot token).
+      # Create it on the host from config.js.example before deploying.
+      - ./config.js:/app/config.js:ro
+      - stickerimage-storage:/app/storage
+
+volumes:
+  stickerimage-storage:

@@ -1,0 +1,10 @@
+.git
+.idea
+test
+node_modules
+npm-debug.log
+storage
+config.js
+Dockerfile
+docker-compose.yml
+.dockerignore
