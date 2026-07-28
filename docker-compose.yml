@@ -6,18 +6,20 @@ services:
     container_name: telegram-stickerimage-bot
     restart: unless-stopped
     environment:
-      # required: get this from @BotFather
-      BOT_TOKEN: "1234567890:YOURTOKENHERE"
-      BOT_USERNAME: "MyAwesomeStickerBot"
+      # values come from Portainer's stack "Environment variables" section
+      # (or a .env file next to this compose file) -- ${VAR} is required
+      # here for that to actually substitute in; a literal value would
+      # ignore whatever you set in the Portainer UI.
+      BOT_TOKEN: "${BOT_TOKEN:?BOT_TOKEN is required, set it in the stack's Environment variables}"
+      BOT_USERNAME: "${BOT_USERNAME:-}"
       # comma-separated numeric Telegram user IDs allowed to use the bot.
       # get yours from a bot like @userinfobot. leave empty to allow anyone.
-      ALLOWED_USERS: ""
-      # optional, defaults shown:
-      # MAX_IMAGES: "50"
-      # MAX_FILE_BYTES: "51380224"
-      # FILE_STORAGE: "./storage"
-      # DEFAULT_LANG: "en"
-      # LOTTIE2GIF_PATH: "lottie2gif"
+      ALLOWED_USERS: "${ALLOWED_USERS:-}"
+      MAX_IMAGES: "${MAX_IMAGES:-50}"
+      MAX_FILE_BYTES: "${MAX_FILE_BYTES:-51380224}"
+      FILE_STORAGE: "${FILE_STORAGE:-./storage}"
+      DEFAULT_LANG: "${DEFAULT_LANG:-en}"
+      LOTTIE2GIF_PATH: "${LOTTIE2GIF_PATH:-lottie2gif}"
     volumes:
       - stickerimage-storage:/app/storage
 
