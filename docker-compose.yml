@@ -4,10 +4,20 @@ services:
     image: telegram-stickerimage-bot:latest
     container_name: telegram-stickerimage-bot
     restart: unless-stopped
+    environment:
+      # required: get this from @BotFather
+      BOT_TOKEN: "1234567890:YOURTOKENHERE"
+      BOT_USERNAME: "MyAwesomeStickerBot"
+      # comma-separated numeric Telegram user IDs allowed to use the bot.
+      # get yours from a bot like @userinfobot. leave empty to allow anyone.
+      ALLOWED_USERS: ""
+      # optional, defaults shown:
+      # MAX_IMAGES: "50"
+      # MAX_FILE_BYTES: "51380224"
+      # FILE_STORAGE: "./storage"
+      # DEFAULT_LANG: "en"
+      # LOTTIE2GIF_PATH: "lottie2gif"
     volumes:
-      # config.js is not part of the image (it holds your bot token).
-      # Create it on the host from config.js.example before deploying.
-      - ./config.js:/app/config.js:ro
       - stickerimage-storage:/app/storage
 
 volumes:

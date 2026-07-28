@@ -30,38 +30,40 @@ Leave it as an empty array (`[]`, the default) to allow anyone.
 
 ### Deploying with Docker / Portainer
 
-The repo includes a `Dockerfile` and `docker-compose.yml`. The image bundles Node.js and `ffmpeg` (needed to convert `.webm` video stickers), but **not** `lottie2gif` — animated `.tgs` sticker conversion will fail gracefully (per-sticker, not a crash) unless you add that binary yourself. The bot uses long-polling, so no port needs to be published.
+The repo includes a `Dockerfile` and `docker-compose.yml`. The image bundles Node.js and `ffmpeg` (needed to convert `.webm` video stickers), but **not** `lottie2gif` -- animated `.tgs` sticker conversion will fail gracefully (per-sticker, not a crash) unless you add that binary yourself. The bot uses long-polling, so no port needs to be published.
 
-**1. Prepare `config.js` on the host**, e.g. at `/opt/telegram-stickerimage-bot/config.js`:
+Configuration is passed in entirely through **environment variables** (no config file needs to be created or bind-mounted on the host):
 
-```bash
-mkdir -p /opt/telegram-stickerimage-bot
-cd /opt/telegram-stickerimage-bot
-curl -O https://raw.githubusercontent.com/zjw88282740/telegram-stickerimage-bot/master/config.js.example
-mv config.js.example config.js
-# edit config.js: set your bot token, and allowed_users if you want to restrict access
-```
+| Variable | Required | Default | Notes |
+|---|---|---|---|
+| `BOT_TOKEN` | yes | -- | from [@BotFather](https://telegram.me/BotFather) |
+| `BOT_USERNAME` | no | `` | your bot's `@username` |
+| `ALLOWED_USERS` | no | `` (everyone allowed) | comma-separated numeric Telegram user IDs, e.g. `123456789,987654321` -- get yours from [@userinfobot](https://telegram.me/userinfobot) |
+| `MAX_IMAGES` | no | `50` | max stickers per pack |
+| `MAX_FILE_BYTES` | no | `51380224` (49 MiB) | max zip part size |
+| `FILE_STORAGE` | no | `./storage` | working directory inside the container |
+| `DEFAULT_LANG` | no | `en` | see `lang/` for available codes |
+| `LOTTIE2GIF_PATH` | no | `lottie2gif` | only needed if you added that binary to the image |
 
-**2. Deploy the stack in Portainer** — pick one:
+**1. Deploy the stack in Portainer** -- pick one:
 
-- **Git repository (recommended)**: Portainer → *Stacks* → *Add stack* → *Repository*. Enter this repo's URL, branch, and `docker-compose.yml` as the compose path. Portainer will build the image on the host from the `Dockerfile` in the repo. Then, in the created stack, go to the environment's *Volumes*/host filesystem and make sure `./config.js` in the compose file resolves next to where the stack is deployed — simplest is to edit the compose in Portainer's web editor to point the bind mount at the absolute host path instead, e.g.:
-  ```yaml
-  volumes:
-    - /opt/telegram-stickerimage-bot/config.js:/app/config.js:ro
-    - stickerimage-storage:/app/storage
-  ```
-- **Web editor (simpler)**: Portainer → *Stacks* → *Add stack* → *Web editor*. Paste the contents of `docker-compose.yml`, but change the `build: .` line to point at a git context Portainer can reach, or replace it with a pre-built `image:` (see below), and set the `config.js` bind mount to the absolute host path from step 1.
+- **Git repository (recommended)**: Portainer -> *Stacks* -> *Add stack* -> *Repository*. Enter this repo's URL (`https://github.com/zjw88282740/telegram-stickerimage-bot`), branch `master`, and `docker-compose.yml` as the compose path. Portainer will build the image on the host from the `Dockerfile` in the repo.
+- **Web editor**: Portainer -> *Stacks* -> *Add stack* -> *Web editor*, paste the contents of `docker-compose.yml` directly. If you'd rather not let Portainer build, replace `build: .` with a pre-built `image:` (see step 2 below).
 
-**3. (Optional) Build and push the image yourself** instead of letting Portainer build it, then just reference `image: your-registry/telegram-stickerimage-bot:latest` in the stack:
+Either way, in the stack's **Environment variables** section (or directly in the `environment:` block of the compose you pasted), set at least `BOT_TOKEN`, and `ALLOWED_USERS` if you want to restrict access.
+
+**2. (Optional) Build and push the image yourself** instead of letting Portainer build it, then just reference `image: your-registry/telegram-stickerimage-bot:latest` in the stack:
 
 ```bash
 docker build -t your-registry/telegram-stickerimage-bot:latest .
 docker push your-registry/telegram-stickerimage-bot:latest
 ```
 
-**4. Deploy the stack.** Portainer will build/pull the image, create the `stickerimage-storage` volume for persistent working files, and start the bot. Check *Containers → logs* to confirm it connected (`[INTERNAL] [INFO] ...`).
+**3. Deploy the stack.** Portainer will build/pull the image, create the `stickerimage-storage` volume for persistent working files, and start the bot. Check *Containers -> logs* to confirm it connected (`[INTERNAL] [INFO] ...`).
 
-To update after a config or code change, just redeploy the stack from Portainer (*Stacks → your stack → Pull and redeploy* if using an `image:`, or re-deploy to rebuild if using `build:`).
+To update after a config or code change, just redeploy the stack from Portainer (*Stacks -> your stack -> Pull and redeploy* if using an `image:`, or re-deploy to rebuild if using `build:`).
+
+If you'd rather manage a full `config.js` file yourself (e.g. to customize `sticker_sources` or `available_lang`), you can still bind-mount one over the baked-in config instead of using environment variables -- add `- /path/on/host/config.js:/app/config.js:ro` under `volumes:` in `docker-compose.yml`.
 
 ### License
 

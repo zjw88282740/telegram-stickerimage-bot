@@ -14,6 +14,11 @@ RUN npm ci --omit=dev
 COPY bot.js ./
 COPY lang ./lang
 
+# config.js is generated from environment variables at container start
+# (see config.docker.js / docker-compose.yml) — no config file needs to
+# be bind-mounted into the container.
+COPY config.docker.js ./config.js
+
 RUN mkdir -p /app/storage
 
 VOLUME ["/app/storage"]
