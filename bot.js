@@ -27,6 +27,22 @@ bot.use((ctx, next) => {
     return next();
 });
 
+bot.use((ctx, next) => {
+    if (!config.allowed_users || config.allowed_users.length === 0) {
+        return next();
+    }
+    let userId = ctx.from && ctx.from.id;
+    if (userId && config.allowed_users.includes(userId)) {
+        return next();
+    }
+    logger(userId || 'UNKNOWN', 'warn', 'Blocked access from unauthorized user' +
+        (ctx.from && ctx.from.username ? ' @' + ctx.from.username : '') + '.');
+    if (ctx.message) {
+        let chatId = ctx.message.chat.id;
+        return ctx.reply(messages[langSession[chatId] || config.default_lang].msg.access_denied);
+    }
+});
+
 // Check storage path
 let fspath = path.resolve(config.file_storage);
 if (!fs.existsSync(fspath)) {

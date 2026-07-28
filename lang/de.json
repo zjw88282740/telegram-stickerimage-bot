@@ -26,7 +26,8 @@
     "download_error": "Fehler beim Herunterladen des Bildes.",
     "direct_task_started": "Sticker wird verarbeitet... \n\n  Tipp: Verwende /newpack, wenn du:\n    - mehrere Sticker auf einmal herunterladen möchtest,\n    - ein vollständiges Sticker-Set exportieren möchtest",
     "unsupported_sticker_source": "%source% ist keine unterstützte Stickerquelle. Die unterstützten Stickerquellen findest du im Befehl /sources.",
-    "supported_sticker_sources": "Die folgenden Link-URLs sind unterstützte Stickerquellen für den Bot:\n\n%sources%\n\nHänge die Sticker-Set-ID an einen dieser Links an, damit der Bot ihn erkennen kann."
+    "supported_sticker_sources": "Die folgenden Link-URLs sind unterstützte Stickerquellen für den Bot:\n\n%sources%\n\nHänge die Sticker-Set-ID an einen dieser Links an, damit der Bot ihn erkennen kann.",
+    "access_denied": "Entschuldigung, du bist nicht berechtigt, diesen Bot zu verwenden."
   },
   "app": {
     "storagepathnotexist": "Speicherpfad existiert nicht, wird erstellt."

@@ -4,7 +4,12 @@ module.exports = {
     username: 'MyAwesomeStickerBot',
 
     // binary paths
-    lottie2gif: 'lottie2gif'
+    lottie2gif: 'lottie2gif',
+
+    // restrict bot usage to specific Telegram user IDs.
+    // leave empty to allow anyone to use the bot (default).
+    // get your numeric user id from a bot like @userinfobot.
+    allowed_users: [],
 
     // max images allowed in one pack
     maximages: 50,

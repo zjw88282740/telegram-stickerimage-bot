@@ -24,7 +24,8 @@
     "invalid_set": "Ocorreu um erro ao obter informação do conjunto de stickers %setName%.",
     "convert_error": "Ocorreu um erro ao converter um sticker em imagem.",
     "download_error": "Ocorreu um erro ao transferir um sticker.",
-    "direct_task_started": "Convertendo o sticker em imagem... \n\n  Tip: Utiliza o comando /newpack se desejas:\n    - Converter vários stickers simultaneamente,\n    - Converter um conjunto completo de stickers."
+    "direct_task_started": "Convertendo o sticker em imagem... \n\n  Tip: Utiliza o comando /newpack se desejas:\n    - Converter vários stickers simultaneamente,\n    - Converter um conjunto completo de stickers.",
+    "access_denied": "Desculpa, não tens autorização para utilizar este bot."
   },
   "app": {
     "storagepathnotexist": "Diretório de armazenamento temporário não existe, criando o mesmo."

@@ -26,7 +26,8 @@
     "download_error": "Error when downloading image.",
     "direct_task_started": "Processing your sticker... \n\n  Tip: Use /newpack if you want to:\n    - Download multiple stickers at once,\n    - Export a full set of stickers",
     "unsupported_sticker_source": "%source% is not a supported sticker source. Please refer to /sources command for the supported stickers sources.",
-    "supported_sticker_sources": "The following link URLs are supported sticker sources of the bot:\n\n%sources%\n\nAppend the sticker set identifier in one of these links, so that the bot can recognize it."
+    "supported_sticker_sources": "The following link URLs are supported sticker sources of the bot:\n\n%sources%\n\nAppend the sticker set identifier in one of these links, so that the bot can recognize it.",
+    "access_denied": "Sorry, you are not authorized to use this bot."
   },
   "app": {
     "storagepathnotexist": "Storage path not exist, creating."
